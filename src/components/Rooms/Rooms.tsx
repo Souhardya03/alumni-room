@@ -16,19 +16,17 @@ import {
   Users,
   Heart,
   ArrowRight,
-  Bed,
-  Bath,
   AirVent,
   Eye,
   Calendar,
   Award,
-  Shield,
-  Sparkles,
   Filter,
   SortDesc,
+  CheckCircle,
+  Clock,
 } from "lucide-react";
 
-interface HotelCardProps {
+interface RoomCardProps {
   id: number;
   title: string;
   location: string;
@@ -127,7 +125,7 @@ const dummyRooms = [
   },
 ];
 
-const HotelCard: React.FC<HotelCardProps> = ({
+const RoomCard: React.FC<RoomCardProps> = ({
   id,
   title,
   location,
@@ -142,216 +140,183 @@ const HotelCard: React.FC<HotelCardProps> = ({
   available = 0,
   featured = false,
 }) => {
-  const [mainImage, setMainImage] = useState(images[0]);
   const [isLiked, setIsLiked] = useState(false);
-  const [imageLoading, setImageLoading] = useState(true);
   const { token } = useAuth();
   const [open, setOpen] = useState(false);
 
   const getAmenityIcon = (amenity: string) => {
     const iconMap: { [key: string]: React.ReactNode } = {
-      "Free Wi-Fi": <Wifi className="w-4 h-4" />,
-      AC: <AirVent className="w-4 h-4" />,
-      Breakfast: <Coffee className="w-4 h-4" />,
-      "Room Service": <Bed className="w-4 h-4" />,
-      Balcony: <Bath className="w-4 h-4" />,
-      Fan: <AirVent className="w-4 h-4" />,
+      "Free Wi-Fi": <Wifi className="w-3 h-3" />,
+      AC: <AirVent className="w-3 h-3" />,
+      Breakfast: <Coffee className="w-3 h-3" />,
+      "Room Service": <CheckCircle className="w-3 h-3" />,
+      Balcony: <CheckCircle className="w-3 h-3" />,
+      Fan: <AirVent className="w-3 h-3" />,
     };
-    return iconMap[amenity] || <Bed className="w-4 h-4" />;
+    return iconMap[amenity] || <CheckCircle className="w-3 h-3" />;
   };
 
-  const getPriceColor = (price: number) => {
-    if (price >= 1400) return "text-red-600";
-    if (price >= 1000) return "text-orange-600";
-    if (price >= 800) return "text-blue-600";
-    return "text-green-600";
+  const getAvailabilityColor = (available: number) => {
+    if (available <= 2) return "text-red-500 bg-red-50";
+    if (available <= 5) return "text-orange-500 bg-orange-50";
+    return "text-green-600 bg-green-50";
   };
-
-  const getAvailabilityStatus = (available: number) => {
-    if (available <= 2)
-      return { text: "Only few left!", color: "text-red-600 bg-red-50" };
-    if (available <= 5)
-      return {
-        text: "Limited availability",
-        color: "text-orange-600 bg-orange-50",
-      };
-    return { text: "Available", color: "text-green-600 bg-green-50" };
-  };
-
-  const availabilityStatus = getAvailabilityStatus(available);
 
   return (
     <>
-      <Card className="group relative overflow-hidden hover-lift bg-white border-0 shadow-luxury hover:shadow-premium transition-all duration-500 rounded-3xl">
+      <Card className="group relative overflow-hidden hover:shadow-lg transition-all duration-300 border border-gray-200 rounded-lg bg-white">
         {featured && (
-          <div className="absolute top-4 left-4 z-20">
-            <Badge className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-semibold px-3 py-1 shadow-lg">
+          <div className="absolute top-3 left-3 z-10">
+            <Badge className="bg-orange-500 text-white text-xs px-2 py-1 rounded-sm">
               <Award className="w-3 h-3 mr-1" />
-              Featured
+              FEATURED
             </Badge>
           </div>
         )}
 
-        {/* Image Section */}
-        <div className="relative">
-          <div className="relative h-80 overflow-hidden rounded-t-3xl">
+        <div className="flex">
+          {/* Image Section - Compact */}
+          <div className="relative w-64 h-48 shrink-0">
             <Image
-              src={mainImage}
+              src={images[0]}
               alt={title}
               fill
-              className={`object-cover transition-all duration-700 group-hover:scale-110 ${
-                imageLoading ? "blur-sm" : "blur-0"
-              }`}
-              onLoad={() => setImageLoading(false)}
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
             />
-            {imageLoading && (
-              <div className="absolute inset-0 bg-gradient-to-br from-gray-200 to-gray-300 animate-pulse" />
-            )}
 
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-300" />
-
-            {/* Top Floating Elements */}
-            <div className="absolute top-4 right-4 flex flex-col gap-2 z-10">
-              <button
-                onClick={() => setIsLiked(!isLiked)}
-                className="w-11 h-11 rounded-full glass-card flex items-center justify-center hover:bg-white/95 transition-all duration-200 group/heart"
-              >
-                <Heart
-                  className={`w-5 h-5 transition-all duration-200 group-hover/heart:scale-110 ${
-                    isLiked ? "text-red-500 fill-current" : "text-gray-600"
-                  }`}
-                />
-              </button>
-
-              <Link href={`/rooms/${id}`}>
-                <button className="w-11 h-11 rounded-full glass-card flex items-center justify-center hover:bg-white/95 transition-all duration-200 group/view">
-                  <Eye className="w-5 h-5 text-gray-600 group-hover/view:scale-110 transition-transform duration-200" />
-                </button>
-              </Link>
-            </div>
+            {/* Heart Icon */}
+            <button
+              onClick={() => setIsLiked(!isLiked)}
+              className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center hover:bg-white transition-colors"
+            >
+              <Heart
+                className={`w-4 h-4 ${
+                  isLiked ? "text-red-500 fill-current" : "text-gray-600"
+                }`}
+              />
+            </button>
 
             {/* Room Type Badge */}
-            <div className="absolute top-4 left-4 z-10">
-              <Badge className="glass-card text-gray-800 font-semibold px-4 py-2 text-sm">
+            <div className="absolute bottom-3 left-3">
+              <Badge className="bg-white/90 text-gray-800 text-xs px-2 py-1 rounded-sm">
                 {roomType}
               </Badge>
             </div>
+          </div>
 
-            {/* Image Thumbnails */}
-            <div className="absolute bottom-4 left-4 right-4 z-10">
-              <div className="flex space-x-3 justify-center">
-                {images.slice(0, 4).map((img, index) => (
-                  <button
-                    key={index}
-                    className={`relative w-16 h-12 rounded-xl overflow-hidden border-2 transition-all duration-200 hover:scale-105 ${
-                      mainImage === img
-                        ? "border-white shadow-lg"
-                        : "border-white/50 hover:border-white/80"
-                    }`}
-                    onClick={() => setMainImage(img)}
+          {/* Content Section - Compact Layout */}
+          <div className="flex-1 p-4">
+            <div className="flex justify-between h-full">
+              <div className="flex-1 space-y-2">
+                {/* Title and Location */}
+                <div>
+                  <Link href={`/rooms/${id}`}>
+                    <h3 className="text-lg font-semibold text-gray-900 hover:text-blue-600 transition-colors cursor-pointer mb-1">
+                      {title}
+                    </h3>
+                  </Link>
+                  <div className="flex items-center text-gray-500 text-sm">
+                    <MapPin className="w-3 h-3 mr-1" />
+                    <span>
+                      {location} • {distance}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Rating and Reviews */}
+                <div className="flex items-center space-x-2">
+                  <div className="flex items-center bg-green-600 text-white px-2 py-1 rounded text-xs font-medium">
+                    <Star className="w-3 h-3 mr-1 fill-current" />
+                    {rating}
+                  </div>
+                  <span className="text-sm text-gray-500">
+                    ({reviews} reviews)
+                  </span>
+                </div>
+
+                {/* Amenities - Compact Display */}
+                <div className="flex flex-wrap gap-1">
+                  {amenities.slice(0, 3).map((amenity, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center space-x-1 text-xs text-gray-600 bg-gray-50 px-2 py-1 rounded"
+                    >
+                      {getAmenityIcon(amenity)}
+                      <span>{amenity}</span>
+                    </div>
+                  ))}
+                  {amenities.length > 3 && (
+                    <span className="text-xs text-blue-600 font-medium">
+                      +{amenities.length - 3} more
+                    </span>
+                  )}
+                </div>
+
+                {/* Capacity and Availability */}
+                <div className="flex items-center justify-between text-sm">
+                  <div className="flex items-center text-gray-600">
+                    <Users className="w-4 h-4 mr-1" />
+                    <span>Up to {capacity} guests</span>
+                  </div>
+
+                  <div
+                    className={`flex items-center px-2 py-1 rounded-full text-xs font-medium ${getAvailabilityColor(available)}`}
                   >
-                    <Image
-                      src={img}
-                      alt={`thumbnail-${index}`}
-                      fill
-                      className="object-cover"
-                    />
-                  </button>
-                ))}
+                    <Clock className="w-3 h-3 mr-1" />
+                    {available <= 2
+                      ? "Only few left!"
+                      : available <= 5
+                        ? "Limited"
+                        : "Available"}
+                  </div>
+                </div>
+              </div>
+
+              {/* Price and Book Section */}
+              <div className="flex flex-col justify-between items-end ml-4 text-right">
+                <div>
+                  <div className="text-2xl font-bold text-gray-900">
+                    ₹{price.toLocaleString()}
+                  </div>
+                  <div className="text-sm text-gray-500">per night</div>
+                </div>
+
+                <div className="space-y-2">
+                  <Link href={`/rooms/${id}`}>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full text-blue-600 border-blue-600 hover:bg-blue-50"
+                    >
+                      <Eye className="w-4 h-4 mr-1" />
+                      View Details
+                    </Button>
+                  </Link>
+
+                  {token ? (
+                    <Link href={`/rooms/${id}`}>
+                      <Button
+                        size="sm"
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                      >
+                        Book Now
+                        <ArrowRight className="w-4 h-4 ml-1" />
+                      </Button>
+                    </Link>
+                  ) : (
+                    <Button
+                      onClick={() => setOpen(true)}
+                      size="sm"
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      Sign In to Book
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
-
-        <CardContent className="p-8">
-          {/* Header */}
-          <div className="flex justify-between items-start mb-6">
-            <div className="flex-1">
-              <Link href={`/rooms/${id}`}>
-                <h3 className="text-2xl font-bold text-gray-900 hover:text-purple-600 transition-colors cursor-pointer mb-2 leading-tight">
-                  {title}
-                </h3>
-              </Link>
-              <div className="flex items-center text-gray-600 mb-2">
-                <MapPin className="w-4 h-4 mr-2 text-purple-500" />
-                <span className="text-sm font-medium">
-                  {location} • {distance}
-                </span>
-              </div>
-              <div
-                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${availabilityStatus.color}`}
-              >
-                <div className="w-2 h-2 rounded-full bg-current mr-2"></div>
-                {availabilityStatus.text}
-              </div>
-            </div>
-
-            <div className="text-right">
-              <div className="flex items-center space-x-1 mb-2">
-                <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                <span className="font-bold text-gray-900 text-lg">
-                  {rating}
-                </span>
-                <span className="text-sm text-gray-500">({reviews})</span>
-              </div>
-              <div className="text-right">
-                <span className={`text-3xl font-bold ${getPriceColor(price)}`}>
-                  ₹{price.toLocaleString()}
-                </span>
-                <span className="text-sm text-gray-500 block font-medium">
-                  per night
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Amenities */}
-          <div className="mb-6">
-            <h4 className="text-sm font-semibold text-gray-700 mb-3 flex items-center">
-              <Sparkles className="w-4 h-4 mr-2 text-purple-500" />
-              Amenities
-            </h4>
-            <div className="flex flex-wrap gap-2">
-              {amenities.slice(0, 4).map((amenity, index) => (
-                <div
-                  key={index}
-                  className="flex items-center space-x-2 bg-gradient-to-r from-purple-50 to-blue-50 px-4 py-2 rounded-full border border-purple-100 hover:shadow-md transition-all duration-200"
-                >
-                  {getAmenityIcon(amenity)}
-                  <span className="text-sm text-gray-700 font-medium">
-                    {amenity}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Capacity and Book Button */}
-          <div className="flex items-center justify-between pt-6 border-t border-gray-100">
-            <div className="flex items-center text-gray-600">
-              <Users className="w-5 h-5 mr-2 text-purple-500" />
-              <span className="text-sm font-medium">
-                Up to {capacity} guests
-              </span>
-            </div>
-
-            {token ? (
-              <Link href={`/rooms/${id}`}>
-                <Button className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200 btn-modern">
-                  Book Now <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
-              </Link>
-            ) : (
-              <Button
-                onClick={() => setOpen(true)}
-                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-8 py-3 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200 btn-modern"
-              >
-                Sign In to Book
-              </Button>
-            )}
-          </div>
-        </CardContent>
       </Card>
 
       {open && <AuthModal open={open} closed={() => setOpen(false)} />}
@@ -389,83 +354,59 @@ const Rooms: React.FC = () => {
     });
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 pt-20">
-      {/* Hero Header */}
-      <div className="relative py-20 bg-gradient-to-br from-purple-900/95 via-blue-900/90 to-indigo-900/95 mb-16">
-        <div className="absolute inset-0 bg-[url('/images/test-1.jpg')] bg-cover bg-center" />
-        <div className="absolute inset-0 bg-gradient-to-br from-purple-900/95 via-blue-900/90 to-indigo-900/95" />
-
-        <div className="relative container mx-auto px-6 lg:px-8 text-center">
-          <div className="max-w-4xl mx-auto">
-            <Badge className="inline-flex items-center bg-white/10 backdrop-blur-md border border-white/20 text-white font-medium px-6 py-3 rounded-full mb-8">
-              <Shield className="w-4 h-4 mr-2" />
-              Premium Alumni Accommodation
-            </Badge>
-
-            <h1 className="jakarta-font text-5xl md:text-7xl font-bold text-white mb-6 leading-tight">
-              Kanchenjunga{" "}
-              <span className="bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
-                Rooms
-              </span>
+    <div className="min-h-screen bg-gray-50 pt-20">
+      {/* Simplified Header */}
+      <div className="bg-white border-b border-gray-200 py-8">
+        <div className="container mx-auto px-6">
+          <div className="max-w-4xl">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">
+              Kanchenjunga Rooms
             </h1>
-
-            <p className="text-xl md:text-2xl text-blue-100 leading-relaxed max-w-3xl mx-auto mb-8">
-              Rediscover comfort and connection in our thoughtfully designed
-              rooms. Where memories are made and alumni find their home away
-              from home.
+            <p className="text-gray-600">
+              Premium alumni accommodation with modern amenities and comfortable
+              stays
             </p>
-
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button className="bg-white text-purple-700 hover:bg-gray-50 px-8 py-4 rounded-full font-semibold shadow-lg hover:shadow-xl transition-all duration-200">
-                <Calendar className="w-5 h-5 mr-2" />
-                Check Availability
-              </Button>
-              <Button
-                variant="outline"
-                className="bg-white/10 backdrop-blur-md border-white/30 text-white hover:bg-white/20 px-8 py-4 rounded-full font-semibold"
-              >
-                Virtual Tour
-              </Button>
-            </div>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-6 lg:px-8 pb-20">
-        {/* Enhanced Filters */}
-        <div className="glass-card rounded-3xl shadow-luxury p-8 mb-12 border border-white/20">
-          <div className="flex flex-col lg:flex-row gap-8 items-center justify-between">
+      <div className="container mx-auto px-6 py-8">
+        {/* Compact Filters */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+          <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
             {/* Room Type Filter */}
-            <div className="flex flex-wrap gap-3">
-              <div className="flex items-center text-gray-700 font-semibold mr-4">
-                <Filter className="w-5 h-5 mr-2 text-purple-600" />
-                Filter by type:
+            <div className="flex items-center gap-3">
+              <div className="flex items-center text-gray-700 font-medium">
+                <Filter className="w-4 h-4 mr-2" />
+                Filter:
               </div>
-              {roomTypes.map((type) => (
-                <button
-                  key={type}
-                  onClick={() => setSelectedType(type)}
-                  className={`px-6 py-3 rounded-full text-sm font-semibold transition-all duration-200 hover:scale-105 ${
-                    selectedType === type
-                      ? "bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg"
-                      : "bg-white text-gray-700 hover:bg-gray-50 border border-gray-200 shadow-sm"
-                  }`}
-                >
-                  {type === "all" ? "All Rooms" : type}
-                </button>
-              ))}
+              <div className="flex flex-wrap gap-2">
+                {roomTypes.map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => setSelectedType(type)}
+                    className={`px-3 py-1 rounded-full text-sm font-medium transition-colors ${
+                      selectedType === type
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                    }`}
+                  >
+                    {type === "all" ? "All Rooms" : type}
+                  </button>
+                ))}
+              </div>
             </div>
 
             {/* Sort Dropdown */}
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center text-gray-700 font-semibold">
-                <SortDesc className="w-5 h-5 mr-2 text-purple-600" />
-                Sort by:
+            <div className="flex items-center gap-2">
+              <div className="flex items-center text-gray-700 font-medium">
+                <SortDesc className="w-4 h-4 mr-2" />
+                Sort:
               </div>
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="px-6 py-3 rounded-xl border border-gray-200 focus:border-purple-500 focus:ring-4 focus:ring-purple-200 outline-none bg-white shadow-sm font-medium text-gray-700 min-w-[200px]"
+                className="px-3 py-1 rounded border border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none bg-white text-sm"
               >
                 {sortOptions.map((option) => (
                   <option key={option.value} value={option.value}>
@@ -477,39 +418,32 @@ const Rooms: React.FC = () => {
           </div>
         </div>
 
-        {/* Rooms Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-16">
+        {/* Rooms List - Compact Cards */}
+        <div className="space-y-4 mb-8">
           {filteredAndSortedRooms.map((room, index) => (
             <div
               key={room.id}
               className="fade-in"
-              style={{ animationDelay: `${index * 150}ms` }}
+              style={{ animationDelay: `${index * 100}ms` }}
             >
-              <HotelCard {...room} />
+              <RoomCard {...room} />
             </div>
           ))}
         </div>
 
-        {/* Results Summary & Load More */}
-        <div className="text-center space-y-6">
-          <div className="text-gray-600">
-            Showing{" "}
-            <span className="font-semibold text-purple-700">
-              {filteredAndSortedRooms.length}
-            </span>{" "}
-            of{" "}
-            <span className="font-semibold text-purple-700">
-              {dummyRooms.length}
-            </span>{" "}
+        {/* Results Summary */}
+        <div className="text-center space-y-4">
+          <div className="text-gray-600 text-sm">
+            Showing {filteredAndSortedRooms.length} of {dummyRooms.length}{" "}
             available rooms
           </div>
 
           <Button
             variant="outline"
-            className="px-12 py-4 rounded-full border-2 border-purple-200 text-purple-700 hover:bg-purple-50 font-semibold shadow-lg hover:shadow-xl transition-all duration-200 hover:scale-105"
+            className="px-6 py-2 border-gray-300 text-gray-700 hover:bg-gray-50"
           >
             Load More Rooms
-            <ArrowRight className="w-5 h-5 ml-2" />
+            <ArrowRight className="w-4 h-4 ml-2" />
           </Button>
         </div>
       </div>
