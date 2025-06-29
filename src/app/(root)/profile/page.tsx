@@ -657,158 +657,173 @@ export const ResetPassword = ({
   }, [isError, error]);
 
   return (
-    <div>
-      <Dialog open={open} onOpenChange={closed}>
-        <DialogContent className="sm:max-w-[425px] bg-slate-200/95">
-          <DialogHeader>
-            <DialogTitle className="text-center text-xl">
-              Reset Password
-            </DialogTitle>
-            <DialogDescription className="text-center text-black/80">
-              Reset your password from here.
-            </DialogDescription>
-          </DialogHeader>
+    <Dialog open={open} onOpenChange={closed}>
+      <DialogContent className="sm:max-w-[500px] glass-card">
+        <DialogHeader>
+          <DialogTitle className="text-center text-2xl font-bold text-gray-900 jakarta-font">
+            Reset Password
+          </DialogTitle>
+          <DialogDescription className="text-center text-gray-600">
+            Create a new secure password for your account
+          </DialogDescription>
+        </DialogHeader>
 
-          <Formik
-            initialValues={{
-              password: "",
-            }}
-            // validationSchema={AuthSchema}
-            validateOnChange={true}
-            onSubmit={(values: any) => {
-              const passwordChecks = [
-                values.password.length >= 8,
-                /[A-Z]/.test(values.password),
-                /[a-z]/.test(values.password),
-                /[0-9]/.test(values.password),
-                /[!@#$%^&*]/.test(values.password),
-              ];
+        <Formik
+          initialValues={{
+            password: "",
+          }}
+          validateOnChange={true}
+          onSubmit={(values: any) => {
+            const passwordChecks = [
+              values.password.length >= 8,
+              /[A-Z]/.test(values.password),
+              /[a-z]/.test(values.password),
+              /[0-9]/.test(values.password),
+              /[!@#$%^&*]/.test(values.password),
+            ];
 
-              const allValid = passwordChecks.every((rule) => rule);
-              if (!allValid) {
-                toast.warning("Password does not meet all requirements.");
-                return;
-              }
+            const allValid = passwordChecks.every((rule) => rule);
+            if (!allValid) {
+              toast.warning("Password does not meet all requirements.");
+              return;
+            }
 
-              handleSubmit(values);
-            }}
-          >
-            {({ handleChange, values }) => {
-              const passwordRules = [
-                {
-                  label: "At least 8 characters",
-                  valid: values.password.length >= 8,
-                },
-                {
-                  label: "At least one uppercase letter",
-                  valid: /[A-Z]/.test(values.password),
-                },
-                {
-                  label: "At least one lowercase letter",
-                  valid: /[a-z]/.test(values.password),
-                },
-                {
-                  label: "At least one digit",
-                  valid: /[0-9]/.test(values.password),
-                },
-                {
-                  label: "At least one special character (!@#$%^&*)",
-                  valid: /[!@#$%^&*]/.test(values.password),
-                },
-              ];
+            handleSubmit(values);
+          }}
+        >
+          {({ handleChange, values }) => {
+            const passwordRules = [
+              {
+                label: "At least 8 characters",
+                valid: values.password.length >= 8,
+              },
+              {
+                label: "At least one uppercase letter",
+                valid: /[A-Z]/.test(values.password),
+              },
+              {
+                label: "At least one lowercase letter",
+                valid: /[a-z]/.test(values.password),
+              },
+              {
+                label: "At least one digit",
+                valid: /[0-9]/.test(values.password),
+              },
+              {
+                label: "At least one special character (!@#$%^&*)",
+                valid: /[!@#$%^&*]/.test(values.password),
+              },
+            ];
 
-              return (
-                <Form>
-                  <div className="grid gap-4">
-                    <div className="grid gap-2">
-                      <Label htmlFor="password">Password</Label>
-                      <div
-                        className="flex transition-all duration-200 rounded-md"
-                        onClick={() => setShowPassValid(true)}
+            return (
+              <Form>
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <Label
+                      htmlFor="password"
+                      className="flex items-center space-x-2"
+                    >
+                      <Shield className="w-4 h-4" />
+                      <span>New Password</span>
+                    </Label>
+                    <div
+                      className="flex transition-all duration-200 rounded-lg border border-gray-300 focus-within:border-blue-500 focus-within:ring-1 focus-within:ring-blue-500"
+                      onClick={() => setShowPassValid(true)}
+                    >
+                      <Input
+                        id="password"
+                        name="password"
+                        onChange={handleChange}
+                        value={values.password}
+                        type={showPass ? "text" : "password"}
+                        placeholder="Enter your new password"
+                        className="border-0 focus-visible:ring-0 rounded-r-none"
+                      />
+                      <button
+                        type="button"
+                        className="px-3 flex items-center justify-center text-gray-500 hover:text-gray-700"
+                        onClick={() => setShowPass(!showPass)}
                       >
-                        <Input
-                          id="password"
-                          name="password"
-                          onChange={handleChange}
-                          value={values.password}
-                          type={showPass ? "text" : "password"}
-                          placeholder="*******"
-                          className="rounded-r-none bg-[#eeececc3]"
-                        />
-                        <div className="bg-[#eeececc3] rounded-r-md pr-4 flex items-center justify-center cursor-pointer">
-                          {showPass ? (
-                            <Eye
-                              size={18}
-                              color="#555555e6"
-                              onClick={() => setShowPass(false)}
-                            />
-                          ) : (
-                            <EyeOffIcon
-                              size={18}
-                              color="#555555e6"
-                              onClick={() => setShowPass(true)}
-                            />
-                          )}
-                        </div>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <div className="w-2/3">
-                          <ErrorMessage
-                            className="text-red-500 text-sm"
-                            component={"div"}
-                            name={"password"}
-                          />
-                        </div>
-                      </div>
-
-                      <div
-                        className={`grid gap-1 text-sm mt-1 overflow-hidden transition-all duration-300 ease-in-out ${
-                          showPassValid
-                            ? "max-h-64 opacity-100 mb-4"
-                            : "max-h-0 opacity-0"
-                        }`}
-                      >
-                        {passwordRules.map((rule, index) => (
-                          <div key={index} className="flex items-center gap-2">
-                            <span
-                              className={
-                                rule.valid ? "text-green-600" : "text-red-500"
-                              }
-                            >
-                              {rule.valid ? "✅" : "❌"}
-                            </span>
-                            <span
-                              className={
-                                rule.valid ? "text-green-700" : "text-gray-700"
-                              }
-                            >
-                              {rule.label}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
+                        {showPass ? (
+                          <EyeOffIcon className="w-5 h-5" />
+                        ) : (
+                          <Eye className="w-5 h-5" />
+                        )}
+                      </button>
                     </div>
+                    <ErrorMessage
+                      className="text-red-500 text-sm"
+                      component={"div"}
+                      name={"password"}
+                    />
                   </div>
 
-                  <DialogFooter className="mt-3">
-                    <Button
-                      className="w-full flex items-center justify-center gap-2"
-                      type="submit"
-                      disabled={isLoading}
-                    >
-                      {isLoading && (
-                        <Loader2 size={16} className="animate-spin" />
-                      )}
-                      Change Password
-                    </Button>
-                  </DialogFooter>
-                </Form>
-              );
-            }}
-          </Formik>
-        </DialogContent>
-      </Dialog>
-    </div>
+                  <div
+                    className={`space-y-3 overflow-hidden transition-all duration-300 ease-in-out ${
+                      showPassValid
+                        ? "max-h-64 opacity-100"
+                        : "max-h-0 opacity-0"
+                    }`}
+                  >
+                    <h4 className="text-sm font-medium text-gray-700">
+                      Password Requirements:
+                    </h4>
+                    <div className="grid gap-2">
+                      {passwordRules.map((rule, index) => (
+                        <div
+                          key={index}
+                          className="flex items-center space-x-3 text-sm"
+                        >
+                          <div
+                            className={`w-5 h-5 rounded-full flex items-center justify-center ${
+                              rule.valid
+                                ? "bg-green-100 text-green-600"
+                                : "bg-red-100 text-red-600"
+                            }`}
+                          >
+                            {rule.valid ? (
+                              <CheckCircle className="w-3 h-3" />
+                            ) : (
+                              "✕"
+                            )}
+                          </div>
+                          <span
+                            className={
+                              rule.valid ? "text-green-700" : "text-gray-600"
+                            }
+                          >
+                            {rule.label}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                <DialogFooter className="mt-6">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={closed}
+                    className="mr-2"
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    className="gradient-secondary text-white flex items-center space-x-2"
+                    type="submit"
+                    disabled={isLoading}
+                  >
+                    {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
+                    <span>Update Password</span>
+                  </Button>
+                </DialogFooter>
+              </Form>
+            );
+          }}
+        </Formik>
+      </DialogContent>
+    </Dialog>
   );
 };
 
@@ -818,6 +833,9 @@ interface Review {
   year: number;
   review: string;
   rating: number;
+  avatar: string;
+  roomName: string;
+  stayDate: string;
 }
 
 export const ReviewCard: React.FC<Review> = ({
@@ -826,6 +844,9 @@ export const ReviewCard: React.FC<Review> = ({
   year,
   review,
   rating,
+  avatar,
+  roomName,
+  stayDate,
 }) => {
   const initials = name
     .split(" ")
@@ -834,40 +855,47 @@ export const ReviewCard: React.FC<Review> = ({
     .toUpperCase();
 
   return (
-    <div className="bg-white rounded-2xl shadow-md p-6 border border-gray-200">
-      <div className="flex items-center mb-4">
-        <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-lg">
-          {initials}
+    <Card className="glass-card hover-lift border border-gray-200 h-full">
+      <CardContent className="p-6">
+        <div className="flex items-center mb-4">
+          <Avatar className="w-12 h-12">
+            <AvatarImage src={avatar} alt={name} />
+            <AvatarFallback className="text-blue-600 bg-blue-100 font-bold">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          <div className="ml-4 flex-1">
+            <h3 className="text-base font-semibold text-gray-900">{name}</h3>
+            <p className="text-sm text-gray-600">
+              {department} • Batch of {year}
+            </p>
+            <p className="text-xs text-gray-500 mt-1">{stayDate}</p>
+          </div>
         </div>
-        <div className="ml-4">
-          <h3 className="text-[14px] font-semibold text-gray-700">{name}</h3>
-          <p className="text-[12px] text-gray-500">
-            {department} • Batch of {year}
-          </p>
+
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center">
+            {[...Array(5)].map((_, i) => (
+              <Star
+                key={i}
+                className={`w-4 h-4 ${
+                  i < rating ? "text-yellow-400 fill-current" : "text-gray-300"
+                }`}
+              />
+            ))}
+          </div>
+          <Badge className="bg-blue-100 text-blue-700 text-xs">
+            {roomName}
+          </Badge>
         </div>
-      </div>
 
-      <div className="flex items-center mb-3">
-        {[...Array(5)].map((_, i) => (
-          <svg
-            key={i}
-            className={`w-4 h-4 ${
-              i < rating ? "text-yellow-400" : "text-gray-300"
-            } fill-current`}
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-          >
-            <path d="M10 15l-5.878 3.09 1.122-6.545L.488 6.91l6.562-.955L10 0l2.95 5.955 6.562.955-4.756 4.635 1.122 6.545z" />
-          </svg>
-        ))}
-      </div>
-
-      <p className="text-gray-700 text-[14px] text-justify">{review}</p>
-    </div>
+        <p className="text-gray-700 text-sm leading-relaxed">{review}</p>
+      </CardContent>
+    </Card>
   );
 };
 
-interface HotelCardProps {
+interface BookingCardProps {
   id: number;
   title: string;
   location: string;
@@ -878,9 +906,12 @@ interface HotelCardProps {
   images: string[];
   startDate: string;
   endDate: string;
+  status: "upcoming" | "completed" | "ongoing";
+  bookingId: string;
+  guests: number;
 }
 
-const HotelCard: React.FC<HotelCardProps> = ({
+const BookingCard: React.FC<BookingCardProps> = ({
   id,
   title,
   location,
@@ -891,113 +922,199 @@ const HotelCard: React.FC<HotelCardProps> = ({
   images,
   startDate,
   endDate,
+  status,
+  bookingId,
+  guests,
 }) => {
-  const [mainImage, setMainImage] = useState(images[0]);
+  const [mainImage, setMainImage] = useState(0);
 
-  const now = new Date();
-  const start = new Date(startDate);
-  const end = new Date(endDate);
+  const getStatusConfig = (status: string) => {
+    switch (status) {
+      case "upcoming":
+        return {
+          badge: "bg-blue-100 text-blue-700 border-blue-200",
+          text: "Upcoming",
+          icon: <Calendar className="w-4 h-4" />,
+        };
+      case "completed":
+        return {
+          badge: "bg-green-100 text-green-700 border-green-200",
+          text: "Completed",
+          icon: <CheckCircle className="w-4 h-4" />,
+        };
+      case "ongoing":
+        return {
+          badge: "bg-yellow-100 text-yellow-700 border-yellow-200",
+          text: "Ongoing",
+          icon: <Clock className="w-4 h-4" />,
+        };
+      default:
+        return {
+          badge: "bg-gray-100 text-gray-700 border-gray-200",
+          text: "Unknown",
+          icon: <Clock className="w-4 h-4" />,
+        };
+    }
+  };
 
-  let statusBadge = (
-    <Badge className="font-semibold  text-gray-700 text-sm rounded-full px-4 py-1 bg-blue-200 mt-2">
-      Upcoming
-    </Badge>
-  );
+  const statusConfig = getStatusConfig(status);
 
-  if (now > end) {
-    statusBadge = (
-      <Badge className="font-semibold  text-gray-700 text-sm rounded-full px-4 py-1 bg-green-300 mt-2">
-        Completed
-      </Badge>
-    );
-  } else if (now >= start && now <= end) {
-    statusBadge = (
-      <Badge className="font-semibold  text-gray-700 text-sm rounded-full px-4 py-1 bg-yellow-300 mt-2">
-        Ongoing
-      </Badge>
-    );
-  }
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  const calculateNights = () => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+    const diffTime = Math.abs(end.getTime() - start.getTime());
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  };
 
   return (
-    <div className="flex flex-col relative md:flex-row  rounded-lg shadow-md border-2 hover:border-gray-400 duration-200 transition-all p-4 gap-4 bg-white w-full max-w-5xl">
-      {/* Main Image */}
-      <div className="flex flex-col md:flex-row gap-8">
-        <div className="flex gap-2 flex-col">
-          <div className="relative h-50 md:h-40 rounded-md overflow-hidden">
-            <Image
-              src={mainImage}
-              alt="Hotel"
-              fill
-              className="object-cover rounded-md"
-            />
-          </div>
+    <Card className="hover-lift border border-gray-200 overflow-hidden">
+      <CardContent className="p-6">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* Image Section */}
+          <div className="lg:w-80 flex-shrink-0">
+            <div className="relative h-48 lg:h-56 rounded-xl overflow-hidden mb-3">
+              <Image
+                src={images[mainImage]}
+                alt={title}
+                fill
+                className="object-cover"
+              />
 
-          <div className="flex gap-2 flex-wrap">
-            {images.map((img, index) => (
-              <div
-                key={index}
-                className={`relative md:w-16 md:h-12 w-12 h-12 cursor-pointer border-2 ${
-                  mainImage === img ? "border-blue-500" : "border-transparent"
-                } rounded-md`}
-                onClick={() => setMainImage(img)}
-              >
-                <Image
-                  src={img}
-                  alt={`sub-${index}`}
-                  fill
-                  className="object-cover rounded-md"
-                />
+              {/* Status Badge Overlay */}
+              <div className="absolute top-3 left-3">
+                <Badge
+                  className={`${statusConfig.badge} border font-medium px-3 py-1.5 shadow-sm`}
+                >
+                  {statusConfig.icon}
+                  <span className="ml-1">{statusConfig.text}</span>
+                </Badge>
               </div>
-            ))}
+            </div>
+
+            {/* Image Thumbnails */}
+            <div className="flex gap-2">
+              {images.slice(0, 4).map((img, index) => (
+                <button
+                  key={index}
+                  onClick={() => setMainImage(index)}
+                  className={`relative w-16 h-12 rounded-lg overflow-hidden border-2 transition-all ${
+                    mainImage === index
+                      ? "border-blue-500"
+                      : "border-transparent hover:border-gray-300"
+                  }`}
+                >
+                  <Image
+                    src={img}
+                    alt={`Room view ${index + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Content Section */}
+          <div className="flex-1 space-y-4">
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
+              <div>
+                <Link href={`/rooms/${id}`}>
+                  <h3 className="text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors cursor-pointer mb-2">
+                    {title}
+                  </h3>
+                </Link>
+                <div className="flex items-center text-gray-600 mb-2">
+                  <MapPin className="w-4 h-4 mr-1" />
+                  <span className="text-sm">
+                    {location} • {distance}
+                  </span>
+                </div>
+                <div className="text-sm text-gray-500">
+                  Booking ID:{" "}
+                  <span className="font-medium text-gray-700">{bookingId}</span>
+                </div>
+              </div>
+
+              <div className="text-right">
+                <div className="text-2xl font-bold text-gray-900">
+                  ₹{price.toLocaleString()}
+                </div>
+                <div className="text-sm text-gray-500">
+                  {calculateNights()} night{calculateNights() > 1 ? "s" : ""}
+                </div>
+              </div>
+            </div>
+
+            {/* Dates and Details */}
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-gray-50 rounded-lg">
+              <div>
+                <div className="text-xs text-gray-500 mb-1">Check-in</div>
+                <div className="font-semibold text-gray-900">
+                  {formatDate(startDate)}
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 mb-1">Check-out</div>
+                <div className="font-semibold text-gray-900">
+                  {formatDate(endDate)}
+                </div>
+              </div>
+              <div>
+                <div className="text-xs text-gray-500 mb-1">Guests</div>
+                <div className="font-semibold text-gray-900">
+                  {guests} guest{guests > 1 ? "s" : ""}
+                </div>
+              </div>
+            </div>
+
+            {/* Rating and Actions */}
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2">
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center bg-green-600 text-white px-3 py-1.5 rounded-full text-sm font-semibold">
+                  <Star className="w-4 h-4 mr-1 fill-current" />
+                  {rating}
+                </div>
+                <span className="text-sm text-gray-600">
+                  ({reviews.toLocaleString()} reviews)
+                </span>
+              </div>
+
+              <div className="flex space-x-3">
+                <Link href={`/rooms/${id}`}>
+                  <Button variant="outline" size="sm">
+                    View Details
+                  </Button>
+                </Link>
+                {status === "completed" && (
+                  <Button size="sm" className="gradient-secondary text-white">
+                    <Edit3 className="w-4 h-4 mr-2" />
+                    Write Review
+                  </Button>
+                )}
+                {status === "upcoming" && (
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-red-600 border-red-200 hover:bg-red-50"
+                  >
+                    Cancel Booking
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-
-      {/* Divider */}
-      <div className="border hidden md:block md:absolute md:h-full h-[10em] right-[12.5em] md:right-[16em] md:top-0 bottom-0 border-gray-200"></div>
-      <div className="flex md:w-2/3 justify-between ">
-        <div className="flex flex-col justify-between gap-2">
-          <div>
-            <Link href={`/rooms/${id}`}>
-              <h2 className=" text-xl cursor-pointer font-semibold text-black">
-                {title}
-              </h2>
-            </Link>
-            <p className="md:text-sm text-xs text-gray-600 mt-2">
-              <span className="text-[#484848] font-semibold">{location}</span> |{" "}
-              {distance}
-            </p>
-            <Badge className="bg-gray-100 text-gray-700 text-xs mt-2">
-              Couple Friendly
-            </Badge>
-          </div>
-
-          <div className="md:text-sm text-xs text-[#484848] mt-2 flex flex-col gap-1">
-            <p>🧺 Complimentary Meal Included</p>
-            <p>🍳 Breakfast Included</p>
-          </div>
-        </div>
-
-        {/* Rating & Price */}
-        <div className="flex flex-col justify-between items-end text-right min-w-[140px]">
-          <div className="space-y-1">
-            <p className="text-[#484848] text-sm font-semibold">
-              Very Good{" "}
-              <span className="bg-[#484848] text-white text-xs px-2 py-1 rounded-md ml-1">
-                {rating}
-              </span>
-            </p>
-            <p className="text-xs text-gray-500">({reviews} Ratings)</p>
-          </div>
-          <div>
-            <p className="text-lg font-medium text-black">
-              Total: &#8377; {price}
-            </p>
-          </div>
-          {statusBadge}
-        </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 
