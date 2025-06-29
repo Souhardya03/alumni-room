@@ -171,7 +171,7 @@ const Page = () => {
     update,
     { isError: isUpdateError, error: updateError, isLoading: isUpdateLoading },
   ] = useUpdateProfileMutation();
-  const [show, setShow] = useState(1);
+  const [activeTab, setActiveTab] = useState(1);
   const [open, setOpen] = useState<boolean>(false);
   const [logout, { isError, error }] = useLogoutMutation();
 
@@ -202,214 +202,428 @@ const Page = () => {
   }, [error, isError]);
 
   const plugin = React.useRef(
-    Autoplay({ delay: 2000, stopOnInteraction: true }),
+    Autoplay({ delay: 3000, stopOnInteraction: true }),
   );
 
+  const userStats = {
+    totalBookings: dummyRooms.length,
+    totalStays: 12,
+    memberSince: "2018",
+    favoriteRoom: "Executive Suite",
+  };
+
   return (
-    <>
-      <div className="md:p-24 p-3 text-[#464646] flex items-center justify-center bg-[#f4f3f3">
-        <div className="shadow-md  rounded-xl  w-full  md:max-w-7xl">
-          <div className="flex md:flex-row flex-col  gap-2">
-            <div className="border-r p-3  md:h-[65vh] bg-white rounded-xl md:rounded-l-xl border-r-gray-300 w-full flex justify-between md:flex-col items-center md:items-start flex-row md:w-[30%] ">
-              <h3 className="text-sm md:text-lg md:block hidden">My Account</h3>
-              <div className="md:mt-[4em] flex flex-row md:items-start items-center justify-center w-full md:flex-col gap-4">
-                {tabs.map((tab) => (
-                  <div
-                    key={tab.id}
-                    onClick={() => setShow(tab.id)}
-                    className={`${
-                      tab.id === show ? "bg-blue-100" : ""
-                    } flex items-center md:w-full gap-3 p-3 cursor-pointer  rounded-md`}
-                  >
-                    {tab.icons}
-                    <p
-                      className={`text-[14px] md:block ${tab.id == show ? "block" : "hidden"} `}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 pt-20">
+      <div className="container mx-auto px-6 py-8">
+        {/* Header */}
+        <div className="mb-8 fade-in">
+          <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2 jakarta-font">
+            My Account
+          </h1>
+          <p className="text-gray-600 text-lg">
+            Manage your profile, bookings, and account settings
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+          {/* Sidebar */}
+          <div className="lg:col-span-1">
+            <Card className="shadow-soft border border-gray-200 sticky top-24">
+              <CardContent className="p-6">
+                {/* User Profile Summary */}
+                <div className="text-center mb-6 pb-6 border-b border-gray-100">
+                  <Avatar className="w-20 h-20 mx-auto mb-4">
+                    <AvatarImage
+                      src="/images/user-avatar.jpg"
+                      alt={data?.data.name}
+                    />
+                    <AvatarFallback className="text-xl font-bold bg-blue-100 text-blue-600">
+                      {data?.data.name
+                        ?.split(" ")
+                        .map((n: string) => n[0])
+                        .join("")
+                        .toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                    {data?.data.name}
+                  </h3>
+                  <p className="text-gray-600 text-sm">{data?.data.email}</p>
+                  <Badge className="mt-2 bg-green-100 text-green-700 border-green-200">
+                    <UserCheck className="w-3 h-3 mr-1" />
+                    Verified Alumni
+                  </Badge>
+                </div>
+
+                {/* Navigation Tabs */}
+                <nav className="space-y-2 mb-6">
+                  {tabs.map((tab) => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setActiveTab(tab.id)}
+                      className={`w-full flex items-center space-x-3 p-3 rounded-lg text-left transition-all duration-200 ${
+                        tab.id === activeTab
+                          ? "bg-blue-100 text-blue-700 border border-blue-200"
+                          : "text-gray-700 hover:bg-gray-50"
+                      }`}
                     >
-                      {tab.name}
-                    </p>
-                  </div>
-                ))}
-              </div>
-              <div className="border  border-gray-300 h-[6vh] md:h-0 md:w-full md:my-14"></div>
-              <div className="flex md:flex-col flex-row">
-                <div
-                  onClick={() => setOpen(!open)}
-                  className="flex  items-center gap-3 p-3"
-                >
-                  <MdLockReset size={22} />
-                  <p className="cursor-pointer md:block hidden">
-                    Reset Password
-                  </p>
-                </div>
-                <div
-                  onClick={handleLogout}
-                  className="flex items-center gap-3 p-3 "
-                >
-                  <IoMdLogOut size={22} color="red" />
-                  <p className="text-red-500 cursor-pointer md:block hidden">
-                    Logout
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="md:h-[80vh] no-scrollbar overflow-y-scroll overflow-x-hidden  w-full rounded-xl md:rounded-r-xl bg-white">
-              <div className={`${show === 1 ? "block" : "hidden"} `}>
-                <div
-                  className={`border-b p-4 flex justify-between items-center border-b-gray-300`}
-                >
-                  <h3>My Profile</h3>
-                  <Button
-                    type="submit"
-                    onClick={() => formRef.current?.requestSubmit()}
-                    className="bg-blue-500 px-6 hover:bg-blue-600 cursor-pointer"
-                  >
-                    Save
-                  </Button>
-                </div>
-                <div className="p-6">
-                  <h2 className="italic">
-                    Welcome{" "}
-                    <span className="font-semibold italic">
-                      {data?.data.name}
-                    </span>
-                  </h2>
-                  <div className="mt-8">
-                    <Formik
-                      enableReinitialize={true}
-                      initialValues={{
-                        email: data?.data.email || "",
-                        phone: data?.data.phone || "",
-                        name: data?.data.name || "",
-                      }}
-                      // validationSchema={AuthSchema}
-                      validateOnChange={true}
-                      onSubmit={(values: any) => {
-                        handleSubmit(values);
-                      }}
-                    >
-                      {({ handleChange, values }) => {
-                        return (
-                          <Form ref={formRef}>
-                            <div className="grid md:grid-cols-2 gap-4">
-                              <div className="grid gap-2">
-                                <Label htmlFor="email">Email</Label>
-
-                                <Input
-                                  id="email"
-                                  name="email"
-                                  onChange={handleChange}
-                                  value={values.email}
-                                  type="email"
-                                  placeholder="example@gmail.com"
-                                  className="bg-[#f9f9f9c3]"
-                                />
-
-                                <ErrorMessage
-                                  className="text-red-500 text-sm"
-                                  component={"div"}
-                                  name={"email"}
-                                />
-                              </div>
-                              <div className="gap-2 grid">
-                                <Label htmlFor="phone">Phone No.</Label>
-
-                                <Input
-                                  id="phone"
-                                  name="phone"
-                                  onChange={handleChange}
-                                  value={values.phone}
-                                  type="number"
-                                  placeholder="xxxxxxxxxx"
-                                  className="bg-[#f9f9f9c3]"
-                                />
-
-                                <ErrorMessage
-                                  className="text-red-500 text-sm"
-                                  component={"div"}
-                                  name={"phone"}
-                                />
-                              </div>
-                              <div className="gap-2 grid">
-                                <Label htmlFor="name">Name</Label>
-
-                                <Input
-                                  id="name"
-                                  name="name"
-                                  onChange={handleChange}
-                                  value={values.name}
-                                  type="text"
-                                  placeholder="Name"
-                                  className="bg-[#f9f9f9c3]"
-                                />
-
-                                <ErrorMessage
-                                  className="text-red-500 text-sm"
-                                  component={"div"}
-                                  name={"name"}
-                                />
-                              </div>
-                            </div>
-
-                            {/*  */}
-                          </Form>
-                        );
-                      }}
-                    </Formik>
-                    <div className="border border-gray-300 w-full my-8"></div>
-                    {/* My Reviews */}
-                    <div>
-                      <h2 className="font-semibold">My Reviews</h2>
+                      {tab.icon}
                       <div>
-                        <Carousel
-                          className="w-full mt-5 max-w-6xl"
-                          opts={{
-                            align: "start",
-                            loop: true,
-                          }}
-                          plugins={[plugin.current]}
-                          onMouseEnter={plugin.current.stop}
-                          onMouseLeave={plugin.current.reset}
-                        >
-                          <CarouselContent className="-ml-1">
-                            {reviews.map((review, index) => (
-                              <CarouselItem
-                                key={index}
-                                className="pl-1 md:basis-1/2 lg:basis-1/3"
-                              >
-                                <div className="p-1">
-                                  <ReviewCard {...review} />
-                                </div>
-                              </CarouselItem>
-                            ))}
-                          </CarouselContent>
-                          <CarouselPrevious className="md:flex hidden" />
-                          <CarouselNext className="md:flex hidden" />
-                        </Carousel>
+                        <div className="font-medium">{tab.name}</div>
+                        <div className="text-xs text-gray-500">
+                          {tab.description}
+                        </div>
+                      </div>
+                    </button>
+                  ))}
+                </nav>
+
+                {/* Quick Stats */}
+                <div className="space-y-3 mb-6 p-4 bg-gray-50 rounded-lg">
+                  <h4 className="font-semibold text-gray-900 text-sm">
+                    Quick Stats
+                  </h4>
+                  <div className="grid grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <div className="text-gray-500">Total Bookings</div>
+                      <div className="font-semibold text-gray-900">
+                        {userStats.totalBookings}
+                      </div>
+                    </div>
+                    <div>
+                      <div className="text-gray-500">Member Since</div>
+                      <div className="font-semibold text-gray-900">
+                        {userStats.memberSince}
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className={` ${show === 2 ? "block" : "hidden"} `}>
-                <div
-                  className={`border-b p-4 flex
-									justify-between items-center border-b-gray-300`}
-                >
-                  <h3>My Bookings</h3>
+
+                {/* Action Buttons */}
+                <div className="space-y-3">
+                  <Button
+                    onClick={() => setOpen(true)}
+                    variant="outline"
+                    className="w-full justify-start"
+                  >
+                    <Settings className="w-4 h-4 mr-2" />
+                    Reset Password
+                  </Button>
+                  <Button
+                    onClick={handleLogout}
+                    variant="outline"
+                    className="w-full justify-start text-red-600 border-red-200 hover:bg-red-50"
+                  >
+                    <LogOut className="w-4 h-4 mr-2" />
+                    Logout
+                  </Button>
                 </div>
-                <div className="md:my-8 my-4 p-2 md:px-6 flex flex-col gap-6">
-                  {dummyRooms.map((room, index) => (
-                    <HotelCard key={index} {...room} />
-                  ))}
-                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Main Content */}
+          <div className="lg:col-span-3">
+            <Card className="shadow-soft border border-gray-200 min-h-[600px]">
+              {/* Profile Tab */}
+              <div className={`${activeTab === 1 ? "block" : "hidden"}`}>
+                <CardHeader className="border-b border-gray-100">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h2 className="text-xl font-bold text-gray-900">
+                        Personal Information
+                      </h2>
+                      <p className="text-gray-600">
+                        Update your account details and preferences
+                      </p>
+                    </div>
+                    <Button
+                      type="submit"
+                      onClick={() => formRef.current?.requestSubmit()}
+                      className="gradient-secondary text-white px-6"
+                      disabled={isUpdateLoading}
+                    >
+                      {isUpdateLoading ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Saving...
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Save Changes
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </CardHeader>
+
+                <CardContent className="p-6">
+                  {/* Welcome Message */}
+                  <div className="mb-8 p-6 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl border border-blue-100">
+                    <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                      Welcome back, {data?.data.name}! 👋
+                    </h3>
+                    <p className="text-gray-600">
+                      Thank you for being a valued member of our alumni
+                      community. Your account has been active since{" "}
+                      {userStats.memberSince}.
+                    </p>
+                  </div>
+
+                  {/* Profile Form */}
+                  <Formik
+                    enableReinitialize={true}
+                    initialValues={{
+                      email: data?.data.email || "",
+                      phone: data?.data.phone || "",
+                      name: data?.data.name || "",
+                    }}
+                    validateOnChange={true}
+                    onSubmit={(values: any) => {
+                      handleSubmit(values);
+                    }}
+                  >
+                    {({ handleChange, values }) => (
+                      <Form ref={formRef}>
+                        <div className="space-y-6">
+                          <div className="grid md:grid-cols-2 gap-6">
+                            <div className="space-y-2">
+                              <Label
+                                htmlFor="name"
+                                className="flex items-center space-x-2"
+                              >
+                                <User className="w-4 h-4" />
+                                <span>Full Name</span>
+                              </Label>
+                              <Input
+                                id="name"
+                                name="name"
+                                onChange={handleChange}
+                                value={values.name}
+                                type="text"
+                                placeholder="Enter your full name"
+                                className="focus:border-blue-500 focus:ring-blue-500"
+                              />
+                              <ErrorMessage
+                                className="text-red-500 text-sm"
+                                component={"div"}
+                                name={"name"}
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label
+                                htmlFor="email"
+                                className="flex items-center space-x-2"
+                              >
+                                <Mail className="w-4 h-4" />
+                                <span>Email Address</span>
+                              </Label>
+                              <Input
+                                id="email"
+                                name="email"
+                                onChange={handleChange}
+                                value={values.email}
+                                type="email"
+                                placeholder="your.email@example.com"
+                                className="focus:border-blue-500 focus:ring-blue-500"
+                              />
+                              <ErrorMessage
+                                className="text-red-500 text-sm"
+                                component={"div"}
+                                name={"email"}
+                              />
+                            </div>
+
+                            <div className="space-y-2">
+                              <Label
+                                htmlFor="phone"
+                                className="flex items-center space-x-2"
+                              >
+                                <Phone className="w-4 h-4" />
+                                <span>Phone Number</span>
+                              </Label>
+                              <Input
+                                id="phone"
+                                name="phone"
+                                onChange={handleChange}
+                                value={values.phone}
+                                type="tel"
+                                placeholder="+91 XXXXX XXXXX"
+                                className="focus:border-blue-500 focus:ring-blue-500"
+                              />
+                              <ErrorMessage
+                                className="text-red-500 text-sm"
+                                component={"div"}
+                                name={"phone"}
+                              />
+                            </div>
+                          </div>
+
+                          {/* Account Information */}
+                          <div className="pt-6 border-t border-gray-100">
+                            <h4 className="text-lg font-semibold text-gray-900 mb-4">
+                              Account Information
+                            </h4>
+                            <div className="grid md:grid-cols-3 gap-4">
+                              <div className="p-4 bg-gray-50 rounded-lg">
+                                <div className="text-sm text-gray-500 mb-1">
+                                  Member Since
+                                </div>
+                                <div className="font-semibold text-gray-900">
+                                  {userStats.memberSince}
+                                </div>
+                              </div>
+                              <div className="p-4 bg-gray-50 rounded-lg">
+                                <div className="text-sm text-gray-500 mb-1">
+                                  Total Bookings
+                                </div>
+                                <div className="font-semibold text-gray-900">
+                                  {userStats.totalBookings}
+                                </div>
+                              </div>
+                              <div className="p-4 bg-gray-50 rounded-lg">
+                                <div className="text-sm text-gray-500 mb-1">
+                                  Favorite Room
+                                </div>
+                                <div className="font-semibold text-gray-900">
+                                  {userStats.favoriteRoom}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </Form>
+                    )}
+                  </Formik>
+
+                  {/* Reviews Section */}
+                  <div className="mt-8 pt-8 border-t border-gray-100">
+                    <div className="flex items-center justify-between mb-6">
+                      <h4 className="text-lg font-semibold text-gray-900">
+                        My Reviews
+                      </h4>
+                      <Badge className="bg-blue-100 text-blue-700">
+                        {reviews.length} Reviews
+                      </Badge>
+                    </div>
+
+                    <Carousel
+                      className="w-full"
+                      opts={{
+                        align: "start",
+                        loop: true,
+                      }}
+                      plugins={[plugin.current]}
+                      onMouseEnter={plugin.current.stop}
+                      onMouseLeave={plugin.current.reset}
+                    >
+                      <CarouselContent className="-ml-1">
+                        {reviews.map((review, index) => (
+                          <CarouselItem
+                            key={index}
+                            className="pl-1 md:basis-1/2 lg:basis-1/2"
+                          >
+                            <div className="p-1">
+                              <ReviewCard {...review} />
+                            </div>
+                          </CarouselItem>
+                        ))}
+                      </CarouselContent>
+                      <CarouselPrevious className="hidden md:flex" />
+                      <CarouselNext className="hidden md:flex" />
+                    </Carousel>
+                  </div>
+                </CardContent>
               </div>
-            </div>
+
+              {/* Bookings Tab */}
+              <div className={`${activeTab === 2 ? "block" : "hidden"}`}>
+                <CardHeader className="border-b border-gray-100">
+                  <div>
+                    <h2 className="text-xl font-bold text-gray-900">
+                      My Bookings
+                    </h2>
+                    <p className="text-gray-600">
+                      View and manage your room reservations
+                    </p>
+                  </div>
+                </CardHeader>
+
+                <CardContent className="p-6">
+                  {/* Booking Stats */}
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+                    <div className="p-4 bg-blue-50 rounded-lg border border-blue-100">
+                      <div className="flex items-center space-x-3">
+                        <Calendar className="w-8 h-8 text-blue-600" />
+                        <div>
+                          <div className="text-sm text-blue-600">Upcoming</div>
+                          <div className="text-xl font-bold text-blue-900">
+                            {
+                              dummyRooms.filter(
+                                (room) => room.status === "upcoming",
+                              ).length
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-4 bg-green-50 rounded-lg border border-green-100">
+                      <div className="flex items-center space-x-3">
+                        <CheckCircle className="w-8 h-8 text-green-600" />
+                        <div>
+                          <div className="text-sm text-green-600">
+                            Completed
+                          </div>
+                          <div className="text-xl font-bold text-green-900">
+                            {
+                              dummyRooms.filter(
+                                (room) => room.status === "completed",
+                              ).length
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="p-4 bg-yellow-50 rounded-lg border border-yellow-100">
+                      <div className="flex items-center space-x-3">
+                        <Clock className="w-8 h-8 text-yellow-600" />
+                        <div>
+                          <div className="text-sm text-yellow-600">Ongoing</div>
+                          <div className="text-xl font-bold text-yellow-900">
+                            {
+                              dummyRooms.filter(
+                                (room) => room.status === "ongoing",
+                              ).length
+                            }
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Bookings List */}
+                  <div className="space-y-6">
+                    {dummyRooms.map((room, index) => (
+                      <div
+                        key={index}
+                        className="slide-up"
+                        style={{ animationDelay: `${index * 100}ms` }}
+                      >
+                        <BookingCard {...room} />
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </div>
+            </Card>
           </div>
         </div>
       </div>
+
       <ResetPassword open={open} closed={() => setOpen(false)} />
-    </>
+    </div>
   );
 };
 
