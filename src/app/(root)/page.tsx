@@ -154,9 +154,9 @@ const Page: React.FC = () => {
               >
                 {({ handleChange, setFieldValue }) => (
                   <Form>
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-6 items-end">
+                    <div className="flex gap-6 justify-between items-end">
                       {/* Room Type */}
-                      <div className="space-y-3">
+                      <div className="space-y-3 w-1/2">
                         <Label className="flex items-center text-gray-700 font-semibold">
                           <Bed className="w-4 h-4 mr-2 text-purple-600" />
                           Room Type
@@ -166,16 +166,13 @@ const Page: React.FC = () => {
                             setFieldValue("type", value)
                           }
                         >
-                          <SelectTrigger className="h-12 rounded-xl border-gray-200 focus:border-purple-500">
+                          <SelectTrigger className="h-12 w-full rounded-xl border-gray-200 focus:border-purple-500">
                             <SelectValue placeholder="Select room type" />
                           </SelectTrigger>
                           <SelectContent>
                             <SelectGroup>
-                              <SelectItem value="AC">AC Deluxe</SelectItem>
-                              <SelectItem value="NonAC">Standard</SelectItem>
-                              <SelectItem value="Suite">
-                                Executive Suite
-                              </SelectItem>
+                              <SelectItem value="AC">AC</SelectItem>
+                              <SelectItem value="NonAC">Non AC</SelectItem>
                             </SelectGroup>
                           </SelectContent>
                         </Select>
@@ -191,7 +188,7 @@ const Page: React.FC = () => {
                           name="startDate"
                           type="date"
                           onChange={handleChange}
-                          className="h-12 rounded-xl border-gray-200 focus:border-purple-500"
+                          className="h-14 rounded-xl border-gray-200 focus:border-purple-500"
                         />
                       </div>
 
@@ -205,7 +202,7 @@ const Page: React.FC = () => {
                           name="endDate"
                           type="date"
                           onChange={handleChange}
-                          className="h-12 rounded-xl border-gray-200 focus:border-purple-500"
+                          className="h-14 rounded-xl border-gray-200 focus:border-purple-500"
                         />
                       </div>
 
