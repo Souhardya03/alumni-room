@@ -61,6 +61,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { useDeleteBookingMutation } from "@/store/features/rooms";
+import { ReviewModal } from "@/components/Modals/ReviewModal";
 
 const tabs = [
 	{
@@ -116,6 +117,10 @@ const Page = () => {
 	const [activeTab, setActiveTab] = useState(1);
 	const [open, setOpen] = useState<boolean>(false);
 	const [logout, { isError, error }] = useLogoutMutation();
+	const [reviewModal, setReviewModal] = useState<{
+		open: boolean;
+		booking: BookingData | null;
+	}>({ open: false, booking: null });
 
 	const handleLogout = async () => {
 		const res = await logout();
@@ -196,9 +201,11 @@ const Page = () => {
 									</h3>
 									<p className="text-gray-600 text-sm">{data?.data.email}</p>
 									<Badge className="mt-2 bg-green-100 text-green-700 border-green-200">
-										<UserCheck className="w-3 h-3 mr-1" />Verified {" "}
+										<UserCheck className="w-3 h-3 mr-1" />
+										Verified{" "}
 										{data?.data.role
-											? data.data.role.charAt(0).toUpperCase() + data.data.role.slice(1).toLowerCase()
+											? data.data.role.charAt(0).toUpperCase() +
+											  data.data.role.slice(1).toLowerCase()
 											: ""}
 									</Badge>
 								</div>
@@ -549,7 +556,7 @@ const Page = () => {
 												key={index}
 												className="slide-up"
 												style={{ animationDelay: `${index * 100}ms` }}>
-												<BookingCard {...room} />
+												<BookingCard {...room} name={data?.data.name} email={data?.data.email} role={data?.data.role} />
 											</div>
 										))}
 									</div>
@@ -564,6 +571,8 @@ const Page = () => {
 				open={open}
 				closed={() => setOpen(false)}
 			/>
+
+			
 		</div>
 	);
 };
@@ -803,11 +812,11 @@ export const ReviewCard: React.FC<Review> = ({
 					<div className="ml-4 flex-1">
 						<h3 className="text-base font-semibold text-gray-900">{name}</h3>
 						<Badge className="mt-2 bg-green-100 text-green-700 border-green-200">
-										<UserCheck className="w-3 h-3 mr-1" />
-										{role
-											? role.charAt(0).toUpperCase() + role.slice(1).toLowerCase()
-											: ""}
-									</Badge>
+							<UserCheck className="w-3 h-3 mr-1" />
+							{role
+								? role.charAt(0).toUpperCase() + role.slice(1).toLowerCase()
+								: ""}
+						</Badge>
 						{/* <p className="text-xs text-gray-500 mt-1">{stayDate}</p> */}
 					</div>
 				</div>
@@ -843,17 +852,29 @@ interface BookingCardProps {
 	type: string;
 	purpose: string;
 	numberOfGuests: number;
+	name:string;
+	email:string;
+	role:string;
 }
 
 const BookingCard: React.FC<BookingCardProps> = ({
 	id,
+	name,
+	email,
+	role,
 	startDate,
 	endDate,
 	numberOfGuests,
 	total,
 	listing,
+	type,
+	purpose,
 }) => {
 	const [mainImage, setMainImage] = useState(0);
+	const [reviewModal, setReviewModal] = useState<{
+		open: boolean;
+		booking: BookingData | null;
+	}>({ open: false, booking: null });
 
 	const getStatusConfig = (status: string) => {
 		switch (status) {
@@ -942,9 +963,8 @@ const BookingCard: React.FC<BookingCardProps> = ({
 			);
 		}
 	}, [isDeleteBookingError, DeleteBookingError]);
-	
-	const ratings = listing.reviews
-		.map((reviews) => reviews.rating);
+
+	const ratings = listing.reviews.map((reviews) => reviews.rating);
 	const avgRating =
 		ratings.length > 0
 			? (ratings.reduce((sum, r) => sum + r, 0) / ratings.length).toFixed(1)
@@ -1053,7 +1073,8 @@ const BookingCard: React.FC<BookingCardProps> = ({
 						<div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 pt-2">
 							<div className="flex items-center space-x-4">
 								<div className="flex items-center bg-green-600 text-white px-3 py-1.5 rounded-full text-sm font-semibold">
-									<Star className="w-4 h-4 mr-1 fill-current" />{avgRating}
+									<Star className="w-4 h-4 mr-1 fill-current" />
+									{avgRating}
 								</div>
 								<span className="text-sm text-gray-600">
 									({listing.reviews.length.toLocaleString()} reviews)
@@ -1071,7 +1092,22 @@ const BookingCard: React.FC<BookingCardProps> = ({
 								{status === "completed" && (
 									<Button
 										size="sm"
-										className="gradient-secondary text-white">
+										className="gradient-secondary text-white"
+										onClick={() =>
+											setReviewModal({
+												open: true,
+												booking: {
+													id,
+													startDate,
+													endDate,
+													numberOfGuests,
+													total,
+													listing,
+													type,
+													purpose,
+												} as BookingData,
+											})
+										}>
 										<Edit3 className="w-4 h-4 mr-2" />
 										Write Review
 									</Button>
@@ -1128,6 +1164,30 @@ const BookingCard: React.FC<BookingCardProps> = ({
 					</div>
 				</div>
 			</CardContent>
+			<ReviewModal
+				open={reviewModal.open}
+				onClose={() => setReviewModal({ open: false, booking: null })}
+				booking={
+					reviewModal.booking
+						? {
+								id: reviewModal.booking.id,
+								listing: {
+									id: reviewModal.booking.listing.id,
+									title: reviewModal.booking.listing.title,
+									images: reviewModal.booking.listing.images,
+								},
+								startDate: reviewModal.booking.startDate,
+								endDate: reviewModal.booking.endDate,
+								numberOfGuests: reviewModal.booking.numberOfGuests,
+						  }
+						: undefined
+				}
+				userInfo={{
+					name: name || "",
+					email:  email || "",
+					role: role || ""
+				}}
+			/>
 		</Card>
 	);
 };

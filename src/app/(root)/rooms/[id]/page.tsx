@@ -36,8 +36,10 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Loader2, UserCheck } from "lucide-react";
 import { useAuth } from "@/store/AuthContext";
+import Loader from "@/components/Loader";
+import { Badge } from "@/components/ui/badge";
 
 const dummyRooms = [
 	{
@@ -57,47 +59,47 @@ const dummyRooms = [
 	},
 ];
 
-const reviews = [
-	{
-		name: "Shayan Kundu",
-		department: "Computer Science",
-		year: 2022,
-		review:
-			"Staying at the Alumni House brought back so many memories! The comfort, hospitality, and location were just perfect. The room was spotless and the amenities exceeded my expectations.",
-		rating: 5,
-		avatar: "/images/reviewer-1.jpg",
-		stayDate: "December 2023",
-	},
-	{
-		name: "Aarav Mehta",
-		department: "Mechanical Engineering",
-		year: 2020,
-		review:
-			"It felt amazing to be back on campus. The Alumni House was cozy and had everything I needed for a comfortable stay. The staff was incredibly helpful and friendly.",
-		rating: 4,
-		avatar: "/images/reviewer-2.jpg",
-		stayDate: "November 2023",
-	},
-	{
-		name: "Sneha Roy",
-		department: "Biotechnology",
-		year: 2019,
-		review:
-			"Loved the peaceful environment and how welcoming the staff were. Definitely a must-stay place for visiting alumni. The breakfast was delicious and the room service was prompt.",
-		rating: 5,
-		avatar: "/images/reviewer-3.jpg",
-		stayDate: "October 2023",
-	},
-];
+// const reviews = [
+// 	{
+// 		name: "Shayan Kundu",
+// 		department: "Computer Science",
+// 		year: 2022,
+// 		review:
+// 			"Staying at the Alumni House brought back so many memories! The comfort, hospitality, and location were just perfect. The room was spotless and the amenities exceeded my expectations.",
+// 		rating: 5,
+// 		avatar: "/images/reviewer-1.jpg",
+// 		stayDate: "December 2023",
+// 	},
+// 	{
+// 		name: "Aarav Mehta",
+// 		department: "Mechanical Engineering",
+// 		year: 2020,
+// 		review:
+// 			"It felt amazing to be back on campus. The Alumni House was cozy and had everything I needed for a comfortable stay. The staff was incredibly helpful and friendly.",
+// 		rating: 4,
+// 		avatar: "/images/reviewer-2.jpg",
+// 		stayDate: "November 2023",
+// 	},
+// 	{
+// 		name: "Sneha Roy",
+// 		department: "Biotechnology",
+// 		year: 2019,
+// 		review:
+// 			"Loved the peaceful environment and how welcoming the staff were. Definitely a must-stay place for visiting alumni. The breakfast was delicious and the room service was prompt.",
+// 		rating: 5,
+// 		avatar: "/images/reviewer-3.jpg",
+// 		stayDate: "October 2023",
+// 	},
+// ];
 
 interface RoomDetailsProps {
-	params: { id: string };
+	params: Promise<{ id: string }>;
 }
 
 const RoomDetails: React.FC<RoomDetailsProps> = ({
 	params,
 }: RoomDetailsProps) => {
-	const { id } = params;
+	const { id } = React.use(params);
 	const { data } = useGetListingByIdQuery({ id });
 	const room = data?.data;
 	const plugin = React.useRef(
@@ -166,7 +168,7 @@ const RoomDetails: React.FC<RoomDetailsProps> = ({
 					? room?.singleOccupancy ?? 0
 					: room?.doubleOccupancy ?? 0;
 			if (values.type === "AC") {
-				extraCharge = 500 * nights;
+				extraCharge = values.guests === 1 ? 400 * nights : 500 * nights;
 			}
 		}
 
@@ -213,16 +215,20 @@ const RoomDetails: React.FC<RoomDetailsProps> = ({
 		createBookingError,
 	]);
 
+	const reviews: any = data?.data.reviews || [];
+
+	if (!room) {
+		return <Loader />;
+	}
+
 	return (
 		<div className="bg-white py-28 px-4 md:px-40">
 			{/* Title & Location */}
 			<div className="mb-6">
-				<h2 className="text-4xl text-[#434343] playfair">
-					Executive Suite - {room?.title}
-				</h2>
+				<h2 className="text-4xl text-[#434343] playfair">{room?.title}</h2>
 				<div className="flex md:items-center text-gray-500">
 					<MdLocationPin className="mt-0.5 md:mt-0" />
-					<p className="text-sm md:text-lg">Kanchenjunga,JGEC</p>
+					<p className="text-sm md:text-lg">Kanchenjunga, JGEC</p>
 				</div>
 			</div>
 
@@ -230,14 +236,14 @@ const RoomDetails: React.FC<RoomDetailsProps> = ({
 			<div className="flex md:flex-row flex-col gap-4">
 				<div className="relative md:w-11/12 h-[200px] md:h-[400px] rounded-xl overflow-hidden">
 					<Image
-						src={dummyRooms[0].images[mainImage]}
+						src={`http://localhost:5000${room?.images[mainImage].url}`}
 						alt="Main Room"
 						fill
 						className="object-cover"
 					/>
 				</div>
 				<div className="grid w-full  grid-cols-2 gap-4">
-					{dummyRooms[0].images.map((img, i) => (
+					{room.images.map((img, i) => (
 						<div
 							key={i}
 							onClick={() => setMainImage(i)}
@@ -245,7 +251,7 @@ const RoomDetails: React.FC<RoomDetailsProps> = ({
 								mainImage === i ? "border-gray-400" : "border-transparent"
 							}`}>
 							<Image
-								src={img}
+								src={`http://localhost:5000${img.url}`}
 								alt="Room"
 								fill
 								className="object-cover"
@@ -405,7 +411,7 @@ const RoomDetails: React.FC<RoomDetailsProps> = ({
 							{isRoomAvailable ? (
 								<Button
 									type="button"
-									disabled = {isCreateBookingLoading}
+									disabled={isCreateBookingLoading}
 									onClick={() => {
 										handleSubmit(formik.values);
 									}}
@@ -439,47 +445,46 @@ const RoomDetails: React.FC<RoomDetailsProps> = ({
 				<p className="text-sm md:text-lg text-[#373737] text-center">
 					Hear firsthand from alumni who've stayed with us.
 				</p>
-				<Carousel
+				{reviews?<Carousel
 					className="w-full mt-10"
 					opts={{ align: "start", loop: true }}
 					plugins={[plugin.current]}
 					onMouseEnter={plugin.current.stop}
 					onMouseLeave={plugin.current.reset}>
 					<CarouselContent className="-ml-1">
-						{reviews.map((review, index) => (
-							<CarouselItem
-								key={index}
-								className="pl-1 md:basis-1/2 lg:basis-1/3">
-								<div className="p-1">
-									<ReviewCard {...review} />
-								</div>
-							</CarouselItem>
-						))}
+						{reviews &&
+							reviews.map((review: any, index: any) => (
+								<CarouselItem
+									key={index}
+									className="pl-1 md:basis-1/2 lg:basis-1/3">
+									<div className="p-1">
+										<ReviewCard {...review} />
+									</div>
+								</CarouselItem>
+							))}
 					</CarouselContent>
 					<CarouselPrevious className="hidden md:flex" />
 					<CarouselNext className="hidden md:flex" />
-				</Carousel>
+				</Carousel>:
+				<div className="mt-14">No reviews posted yet.</div>
+				}
+				
 			</div>
 		</div>
 	);
 };
 
 interface Review {
-	name: string;
-	department: string;
-	year: number;
-	review: string;
+	user: {
+		name: string;
+		role: string;
+	};
+	content: string;
 	rating: number;
 }
 
-const ReviewCard: React.FC<Review> = ({
-	name,
-	department,
-	year,
-	review,
-	rating,
-}) => {
-	const initials = name
+const ReviewCard: React.FC<Review> = ({ user, content, rating }) => {
+	const initials = user.name
 		.split(" ")
 		.map((n) => n[0])
 		.join("")
@@ -492,10 +497,14 @@ const ReviewCard: React.FC<Review> = ({
 					{initials}
 				</div>
 				<div className="ml-4">
-					<h3 className="text-lg font-semibold text-gray-700">{name}</h3>
-					<p className="text-sm text-gray-500">
-						{department} • Batch of {year}
-					</p>
+					<h3 className="text-lg font-semibold text-gray-700">{user.name}</h3>
+					<Badge className="mt-2 bg-green-100 text-green-700 border-green-200">
+						<UserCheck className="w-3 h-3 mr-1" />
+						{user.role
+							? user.role.charAt(0).toUpperCase() +
+							  user.role.slice(1).toLowerCase()
+							: ""}
+					</Badge>
 				</div>
 			</div>
 
@@ -512,7 +521,7 @@ const ReviewCard: React.FC<Review> = ({
 				))}
 			</div>
 
-			<p className="text-gray-700 text-justify">{review}</p>
+			<p className="text-gray-700 text-justify">{content}</p>
 		</div>
 	);
 };

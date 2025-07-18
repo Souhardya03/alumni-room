@@ -35,6 +35,7 @@ import {
 import React from "react";
 import Autoplay from "embla-carousel-autoplay";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 const images = [
   { id: 1, link: "/images/test-1.jpg" },
@@ -84,7 +85,7 @@ const features = [
 
 const stats = [
   { number: "500+", label: "Happy Alumni" },
-  { number: "50+", label: "Comfortable Rooms" },
+  { number: "4", label: "Comfortable Rooms" },
   { number: "4.8", label: "Average Rating" },
   { number: "24/7", label: "Support" },
 ];
@@ -93,7 +94,7 @@ const Page: React.FC = () => {
   const plugin = React.useRef(
     Autoplay({ delay: 3000, stopOnInteraction: true }),
   );
-
+  const router = useRouter();
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -128,10 +129,11 @@ const Page: React.FC = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-              <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200">
+              <Button onClick={()=>router.replace("/rooms")} className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white px-8 py-4 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200">
                 Book Your Stay <ArrowRight className="ml-2 w-5 h-5" />
               </Button>
               <Button
+              onClick={()=>router.replace("/about")}
                 variant="outline"
                 className="bg-white/10 backdrop-blur-md border-white/30 text-white hover:bg-white/20 px-8 py-4 rounded-full text-lg font-semibold"
               >
@@ -140,8 +142,7 @@ const Page: React.FC = () => {
             </div>
           </div>
 
-          {/* Booking Form */}
-          <div className="max-w-5xl mx-auto">
+          {/* <div className="max-w-5xl mx-auto">
             <div className="bg-white/95 backdrop-blur-md rounded-3xl shadow-luxury p-8 border border-white/20">
               <Formik
                 initialValues={{
@@ -155,7 +156,6 @@ const Page: React.FC = () => {
                 {({ handleChange, setFieldValue }) => (
                   <Form>
                     <div className="flex gap-6 justify-between items-end">
-                      {/* Room Type */}
                       <div className="space-y-3 w-1/2">
                         <Label className="flex items-center text-gray-700 font-semibold">
                           <Bed className="w-4 h-4 mr-2 text-purple-600" />
@@ -178,7 +178,6 @@ const Page: React.FC = () => {
                         </Select>
                       </div>
 
-                      {/* Check-in */}
                       <div className="space-y-3">
                         <Label className="flex items-center text-gray-700 font-semibold">
                           <Calendar className="w-4 h-4 mr-2 text-purple-600" />
@@ -192,7 +191,6 @@ const Page: React.FC = () => {
                         />
                       </div>
 
-                      {/* Check-out */}
                       <div className="space-y-3">
                         <Label className="flex items-center text-gray-700 font-semibold">
                           <Calendar className="w-4 h-4 mr-2 text-purple-600" />
@@ -206,7 +204,6 @@ const Page: React.FC = () => {
                         />
                       </div>
 
-                      {/* Search Button */}
                       <Button
                         type="submit"
                         className="h-12 bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
@@ -218,7 +215,7 @@ const Page: React.FC = () => {
                 )}
               </Formik>
             </div>
-          </div>
+          </div> */}
         </div>
 
         {/* Floating Stats */}

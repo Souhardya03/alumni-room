@@ -16,7 +16,13 @@ interface IListing {
 					url: string;
 				}
 			];
-			reviews: [];
+			reviews: [
+				{
+					id: number;
+					content: string;
+					rating: number;
+				}
+			];
 			title: string;
 			type: string;
 			user: {
@@ -71,6 +77,7 @@ export const listingApi = baseApi
 			"check-availality",
 			"create-booking",
 			"delete-booking",
+			"create-review",
 		],
 	})
 	.injectEndpoints({
@@ -121,6 +128,22 @@ export const listingApi = baseApi
 				}),
 				invalidatesTags: ["delete-booking"],
 			}),
+			createReview: builder.mutation<IResponse, { id: number; data: any }>({
+				query: ({ id, data }) => ({
+					url: `/reviews/create/${id}`,
+					method: "POST",
+					body: data,
+					credentials: "include",
+				}),
+				invalidatesTags: ["create-review"],
+			}),
+			getBookingbyId: builder.query<any, any>({
+				query: (id) => ({
+					url: `/bookings/get-booking/${id}`,
+					method: "GET",
+					credentials: "include",
+				}),
+			}),
 		}),
 	});
 export const {
@@ -129,4 +152,6 @@ export const {
 	useCheckAvailabilityMutation,
 	useCreateBookingMutation,
 	useDeleteBookingMutation,
+	useCreateReviewMutation,
+	useGetBookingbyIdQuery,
 } = listingApi;
