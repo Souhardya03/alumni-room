@@ -1,50 +1,174 @@
-# Welcome to your Expo app 👋
+# Alumni Room Mobile App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native mobile application for the Kanchenjunga Alumni House booking system, built with Expo.
 
-## Get started
+## Features
 
-1. Install dependencies
+- **Home Screen**: Hero section, features showcase, and reviews
+- **Rooms Listing**: Browse available rooms with search and filtering
+- **Room Details**: Detailed view with image gallery, amenities, and pricing
+- **Authentication**: Login and registration system
+- **Profile Management**: User profile and account settings
+- **About Page**: Information about Kanchenjunga Alumni House
+
+## Technology Stack
+
+- **React Native** with **Expo**
+- **TypeScript** for type safety
+- **Expo Router** for navigation
+- **Redux Toolkit** with **RTK Query** for state management
+- **React Query** for server state management
+- **AsyncStorage** for local data persistence
+- **Expo Linear Gradient** for UI enhancements
+
+## Getting Started
+
+### Prerequisites
+
+- Node.js 18 or higher
+- Expo CLI: `npm install -g @expo/cli`
+- Expo Go app on your mobile device
+
+### Installation
+
+1. Navigate to the mobile app directory:
+
+   ```bash
+   cd alumni-room-mobile
+   ```
+
+2. Install dependencies:
 
    ```bash
    npm install
    ```
 
-2. Start the app
+3. Update package versions for compatibility:
 
    ```bash
-   npx expo start
+   npx expo install --fix
    ```
 
-In the output, you'll find options to open the app in a
+4. Start the development server:
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+   ```bash
+   npm start
+   ```
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+5. Scan the QR code with Expo Go app (Android) or Camera app (iOS)
 
-## Get a fresh project
+## Project Structure
 
-When you're ready, run:
-
-```bash
-npm run reset-project
+```
+alumni-room-mobile/
+├── app/                    # App screens with Expo Router
+│   ├── (tabs)/            # Tab-based navigation
+│   │   ├── index.tsx      # Home screen
+│   │   ├── rooms.tsx      # Rooms listing
+│   │   ├── about.tsx      # About page
+│   │   └── profile.tsx    # Profile screen
+│   ├── auth.tsx           # Authentication modal
+│   ├── room/[id].tsx      # Room details screen
+│   └── _layout.tsx        # Root layout
+├── store/                 # Redux store and API
+│   ├── features/
+│   │   └── rooms.ts       # Rooms API slice
+│   ├── AuthContext.tsx    # Authentication context
+│   ├── baseApi.ts         # Base API configuration
+│   └── index.ts           # Store configuration
+├── assets/                # Static assets
+└── package.json
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+## Key Features Implementation
 
-## Learn more
+### Navigation
 
-To learn more about developing your project with Expo, look at the following resources:
+- Tab-based navigation for main screens
+- Stack navigation for detailed views
+- Modal presentation for authentication
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+### State Management
 
-## Join the community
+- Redux Toolkit for global state
+- RTK Query for API calls and caching
+- React Context for authentication state
+- AsyncStorage for token persistence
 
-Join our community of developers creating universal apps.
+### API Integration
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+- RESTful API integration with the backend
+- Automatic token management
+- Error handling and loading states
+- Optimistic updates for better UX
+
+### UI/UX
+
+- Native mobile components
+- Responsive design for different screen sizes
+- Smooth animations and transitions
+- Platform-specific styling
+
+## Backend Integration
+
+The app connects to the same backend API as the Next.js web application:
+
+- **Base URL**: `http://localhost:5000`
+- **Authentication**: Cookie-based sessions
+- **Endpoints**: Rooms, bookings, reviews, user management
+
+Make sure the backend server is running on `localhost:5000` for the mobile app to work properly.
+
+## Development Commands
+
+```bash
+# Start development server
+npm start
+
+# Run on Android emulator
+npm run android
+
+# Run on iOS simulator (macOS only)
+npm run ios
+
+# Run in web browser
+npm run web
+
+# Build for production
+npm run build
+```
+
+## Platform Support
+
+- **iOS**: Requires iOS 11.0 or later
+- **Android**: Requires Android 5.0 (API level 21) or later
+- **Web**: Modern browsers with ES6 support
+
+## Environment Variables
+
+Create a `.env` file in the root directory:
+
+```env
+EXPO_PUBLIC_API_URL=http://localhost:5000
+```
+
+## Future Enhancements
+
+- Push notifications for booking confirmations
+- Offline support for viewing booked rooms
+- In-app payments integration
+- Photo upload for user profiles
+- Dark mode support
+- Multi-language support
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Test on both iOS and Android
+5. Submit a pull request
+
+## License
+
+This project is part of the Alumni Room booking system for JGEC.
