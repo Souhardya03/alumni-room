@@ -1,8 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
-import { useDispatch } from 'react-redux';
-import { setCredentials, logout } from './slices/authSlice';
-import { useGetProfileQuery } from './baseApi';
 
 interface AuthContextType {
   token: string | null;
@@ -22,12 +19,8 @@ const AuthContext = createContext<AuthContextType>({
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
+  const [user, setUser] = useState<any | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const dispatch = useDispatch();
-
-  const { data: user, refetch } = useGetProfileQuery(undefined, {
-    skip: !token,
-  });
 
   useEffect(() => {
     loadStoredToken();
@@ -38,7 +31,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const storedToken = await SecureStore.getItemAsync('token');
       if (storedToken) {
         setToken(storedToken);
-        dispatch(setCredentials({ token: storedToken, user: null }));
+        // You can fetch user data here if needed
       }
     } catch (error) {
       console.error('Error loading stored token:', error);
@@ -51,7 +44,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await SecureStore.setItemAsync('token', newToken);
       setToken(newToken);
-      dispatch(setCredentials({ token: newToken, user: userData }));
+      setUser(userData);
     } catch (error) {
       console.error('Error storing token:', error);
     }
@@ -61,7 +54,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await SecureStore.deleteItemAsync('token');
       setToken(null);
-      dispatch(logout());
+      setUser(null);
     } catch (error) {
       console.error('Error removing token:', error);
     }
